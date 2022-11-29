@@ -5,12 +5,9 @@ import sys
 import time
 
 class Service(QRunnable):
-    default_n = QThreadPool.globalInstance().maxThreadCount()
-
-    def __init__(self, script, n_thread=default_n):
+    def __init__(self, script: str):
         super().__init__()
         self.script = script
-        self.n_thread = n_thread
 
     def run(self):
         os.system(f"./{self.script}")
@@ -29,6 +26,7 @@ class MyApp(QWidget):
         self.dropdown = QComboBox()
         self.dropdown.addItems(self.options)
         layout.addWidget(self.dropdown)
+        self.seed()
 
         self.button = QPushButton('Launch')
         layout.addWidget(self.button)
@@ -36,12 +34,23 @@ class MyApp(QWidget):
 
     def launch(self):
         option = self.dropdown.currentText()
-        if option == "ASR":
-            os.system("./asr.sh")
-        elif option == "OCR":
-            os.system("./ocr.sh")
-        elif option == "ZSC":
-            os.system("./zsc.sh")
+        pool = QThreadPool.globalInstance()
+        service = {
+            "OCR": self.services['OCR'],
+            "ASR": self.services['ASR'],
+            "ZSC": self.services['ZSC']
+        }[option]
+        pool.start(service)
+
+    def seed(self):
+        ocr = Service('ocr.sh')
+        asr = Service('asr.sh')
+        zsc = Service('zsc.sh')
+        self.services = {
+            "OCR": ocr,
+            "ASR": asr,
+            "ZSC": zsc
+        }
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
