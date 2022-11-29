@@ -1,6 +1,21 @@
+from PyQt5.QtCore import QRunnable, QThreadPool
 from PyQt5.QtWidgets import QApplication, QComboBox, QVBoxLayout, QWidget, QPushButton
 import os
 import sys
+import time
+
+class Service(QRunnable):
+    default_n = QThreadPool.globalInstance().maxThreadCount()
+
+    def __init__(self, script, n_thread=default_n):
+        super().__init__()
+        self.script = script
+        self.n_thread = n_thread
+
+    def run(self):
+        os.system(f"./{self.script}")
+        time.sleep(1)
+
 
 class MyApp(QWidget):
     def __init__(self):
@@ -32,4 +47,4 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     myApp = MyApp()
     myApp.show()
-    app.exec()
+    sys.exit(app.exec_())
