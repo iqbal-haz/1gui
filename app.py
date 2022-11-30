@@ -1,6 +1,6 @@
 from PyQt5.QtCore import QRunnable, QThreadPool
 from PyQt5.QtWidgets import QApplication, QComboBox, QVBoxLayout, QWidget, QPushButton
-import os
+import subprocess
 import sys
 import time
 
@@ -10,7 +10,7 @@ class Service(QRunnable):
         self.script = script
 
     def run(self):
-        os.system(f"./{self.script}")
+        subprocess.call(f"./{self.script}")
         time.sleep(1)
 
 
