@@ -1,5 +1,7 @@
 from PyQt5.QtCore import QRunnable, QThreadPool
 from PyQt5.QtWidgets import QApplication, QComboBox, QVBoxLayout, QWidget, QPushButton
+import os
+import psutil
 import subprocess
 import sys
 import time
@@ -51,9 +53,21 @@ class MyApp(QWidget):
             "ASR": asr,
             "ZSC": zsc
         }
+        
+def kill_proc_tree(pid, including_parent=True):    
+    parent = psutil.Process(pid)
+    for child in parent.children(recursive=True):
+        child.kill()
+    if including_parent:
+        parent.kill()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     myApp = MyApp()
     myApp.show()
-    sys.exit(app.exec_())
+    app.exec_()
+
+    me = os.getpid()
+    kill_proc_tree(me)
+
+    sys.exit()
